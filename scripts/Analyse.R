@@ -12,7 +12,7 @@ library(igraph)
 library(ggrepel) # To prevent label overlap
 
 # Read the specific worksheet
-omics_data <- read_excel("data/Omics_WoS.xlsx", sheet = "Omics_clean_full")
+omics_data <- read_excel("data/Omics_WoS.xlsx", sheet = "Data")
 
 dir.create("results")
 dir.create("results/figures")

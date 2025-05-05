@@ -13,7 +13,7 @@ library(ggrepel) # To prevent label overlap
 library(patchwork) # For combining plots
 
 # Read the specific worksheet
-omics_data <- read_excel("data/Omics_Details.xlsx", sheet = "Paperdaten")
+omics_data <- read_excel("data/Omics_Details.xlsx", sheet = "Data")
 
 # Create directories for results
 dir.create("results")
