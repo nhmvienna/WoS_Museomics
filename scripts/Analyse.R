@@ -1,5 +1,5 @@
 # Set working directory
-setwd("D:/GitHub/WoS_Museomics")
+setwd("P:/OMICS/Data_Analysis/WoS_Museomics")
 
 # Load required libraries
 library(readxl)
@@ -12,7 +12,7 @@ library(igraph)
 library(ggrepel) # To prevent label overlap
 
 # Read the specific worksheet
-omics_data <- read_excel("data/Omic_WoS.xlsx", sheet = "Omics_clean_full")
+omics_data <- read_excel("data/Omics_WoS.xlsx", sheet = "Omics_clean_full")
 
 dir.create("results")
 dir.create("results/figures")
@@ -21,6 +21,23 @@ dir.create("results/figures")
 glimpse(omics_data) # Structure of the data
 summary(omics_data) # Summary statistics
 head(omics_data) # First few rows
+
+# Total number of unique journals
+n_total_journals <- omics_data %>%
+    filter(!is.na(`Source Title`)) %>%
+    distinct(`Source Title`) %>%
+    nrow()
+
+# Number of journals with >= 4 articles
+n_journals_4plus <- omics_data %>%
+    filter(!is.na(`Source Title`)) %>%
+    count(`Source Title`) %>%
+    filter(n >= 4) %>%
+    nrow()
+
+# Print results
+cat("Total number of journals:", n_total_journals, "\n")
+cat("Number of journals with >= 4 articles:", n_journals_4plus, "\n")
 
 # 1. Create a pie chart of search terms
 # Exclude 'taxonomics' and year 2025 from the analysis

@@ -1,5 +1,5 @@
 # Set working directory
-setwd("D:/GitHub/WoS_Museomics")
+setwd("P:/OMICS/Data_Analysis/WoS_Museomics")
 
 # Load required libraries
 library(readxl)
@@ -13,7 +13,7 @@ library(ggrepel) # To prevent label overlap
 library(patchwork) # For combining plots
 
 # Read the specific worksheet
-omics_data <- read_excel("data/Omic_Analyse.xlsx", sheet = "Paperdaten")
+omics_data <- read_excel("data/Omics_Details.xlsx", sheet = "Paperdaten")
 
 # Create directories for results
 dir.create("results")
@@ -24,38 +24,38 @@ glimpse(omics_data) # Structure of the data
 summary(omics_data) # Summary statistics
 head(omics_data) # First few rows
 
-# Prepare Method data
+# Prepare Methods data
 method_data <- omics_data %>%
-    mutate(Method = ifelse(is.na(Method) | str_trim(Method) == "", "Not defined", Method)) %>%
-    mutate(Method_wrapped = str_wrap(Method, width = 30))
+    mutate(Methods = ifelse(is.na(Methods) | str_trim(Methods) == "", "Not defined", Methods)) %>%
+    mutate(Methods_wrapped = str_wrap(Methods, width = 30))
 
 method_levels <- method_data %>%
-    count(Method_wrapped) %>%
+    count(Methods_wrapped) %>%
     arrange(desc(n)) %>%
-    pull(Method_wrapped)
+    pull(Methods_wrapped)
 
 # Ensure "Not defined" is last
 method_levels <- c(setdiff(method_levels, "Not defined"), "Not defined")
-method_data$Method_wrapped <- factor(method_data$Method_wrapped, levels = method_levels)
+method_data$Methods_wrapped <- factor(method_data$Methods_wrapped, levels = method_levels)
 
-# Prepare Loci data
+# Prepare Marker data
 loci_data <- omics_data %>%
-    mutate(Loci = ifelse(is.na(Loci) | str_trim(Loci) == "", "Not defined", Loci)) %>%
-    mutate(Loci_wrapped = str_wrap(Loci, width = 30))
+    mutate(Marker = ifelse(is.na(Marker) | str_trim(Marker) == "", "Not defined", Marker)) %>%
+    mutate(Marker_wrapped = str_wrap(Marker, width = 30))
 
 loci_levels <- loci_data %>%
-    count(Loci_wrapped) %>%
+    count(Marker_wrapped) %>%
     arrange(desc(n)) %>%
-    pull(Loci_wrapped)
+    pull(Marker_wrapped)
 
 # Ensure "Not defined" is last
 loci_levels <- c(setdiff(loci_levels, "Not defined"), "Not defined")
-loci_data$Loci_wrapped <- factor(loci_data$Loci_wrapped, levels = loci_levels)
+loci_data$Marker_wrapped <- factor(loci_data$Marker_wrapped, levels = loci_levels)
 
-# Prepare Organism-Grouping data (with corrected column name)
+# Prepare Organisms data (with corrected column name)
 organism_grouping_data <- omics_data %>%
-    mutate(`Organism-Grouping` = ifelse(is.na(`Organism-Grouping`) | str_trim(`Organism-Grouping`) == "", "Not defined", `Organism-Grouping`)) %>%
-    mutate(OG_wrapped = str_wrap(`Organism-Grouping`, width = 30))
+    mutate(`Organisms` = ifelse(is.na(`Organisms`) | str_trim(`Organisms`) == "", "Not defined", `Organisms`)) %>%
+    mutate(OG_wrapped = str_wrap(`Organisms`, width = 30))
 
 organism_grouping_levels <- organism_grouping_data %>%
     count(OG_wrapped) %>%
@@ -84,19 +84,19 @@ method_fill <- get_fill_colors(method_levels)
 loci_fill <- get_fill_colors(loci_levels)
 OG_fill <- get_fill_colors(organism_grouping_levels)
 
-# Plot A: Method
-p1 <- ggplot(method_data, aes(x = Method_wrapped, fill = Method_wrapped)) +
+# Plot A: Methods
+p1 <- ggplot(method_data, aes(x = Methods_wrapped, fill = Methods_wrapped)) +
     geom_bar(show.legend = FALSE) +
     scale_fill_manual(values = method_fill) +
-    labs(title = "A) Analysis Method", x = "Method", y = "Count") +
+    labs(title = "A) Analysis Methods", x = "Methods", y = "Count") +
     theme_bw() +
     theme(
         plot.title = element_text(face = "bold", hjust = 0),
         axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)
     )
 
-# Plot B: Loci
-p2 <- ggplot(loci_data, aes(x = Loci_wrapped, fill = Loci_wrapped)) +
+# Plot B: Marker
+p2 <- ggplot(loci_data, aes(x = Marker_wrapped, fill = Marker_wrapped)) +
     geom_bar(show.legend = FALSE) +
     scale_fill_manual(values = loci_fill) +
     labs(title = "B) Marker Type", x = "Marker Type", y = "Count") +
@@ -146,9 +146,9 @@ p4 <- ggplot(key_question_data, aes(x = Key_Question_split, y = n, fill = Key_Qu
         axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)
     )
 
-# Combine all four plots (Method, Loci, Organism Grouping, Key Question)
-combined_plot <- p1 / p2 / p3 / p4 + plot_layout(ncol = 1)
+# Combine A + B in top row, C in bottom row
+combined_plot <- (p1 | p2) / p3 + plot_layout(heights = c(1, 1))
 
 # Save the combined plot
-ggsave("results/figures/Method_Loci_Organism_Grouping_Key_Question_Histograms.pdf", combined_plot, width = 12, height = 14, dpi = 300)
-ggsave("results/figures/Method_Loci_Organism_Grouping_Key_Question_Histograms.png", combined_plot, width = 12, height = 14, dpi = 300)
+ggsave("results/figures/Methods_Marker_Organism_Grouping_Key_Question_Histograms.pdf", combined_plot, width = 12, height = 8, dpi = 300)
+ggsave("results/figures/Methods_Marker_Organism_Grouping_Key_Question_Histograms.png", combined_plot, width = 12, height = 8, dpi = 300)
