@@ -40,12 +40,11 @@ cat("Total number of journals:", n_total_journals, "\n")
 cat("Number of journals with >= 4 articles:", n_journals_4plus, "\n")
 
 # 1. Create a pie chart of search terms
-# Exclude 'taxonomics' and year 2025 from the analysis
+# Exclude year 2025 from the analysis
 # Filter the data
 filtered_data <- omics_data %>%
     filter(
         !is.na(search),
-        search != "taxonomics",
         `Publication Year` != 2025,
         `Publication Type` != "B"
     )
